@@ -139,7 +139,7 @@ const Button = styled.button`
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
-  const backendURL = "http://localhost:5000"; // Change to deployed backend URL when live
+  const backendURL = "https://minutemind-backend.onrender.com/"; // Change to deployed backend URL when live
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
