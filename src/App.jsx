@@ -356,7 +356,7 @@ function App() {
     );
   };
 
-  const handleSendEmail = async () => {
+const handleSendEmail = async () => {
     if (!recipient) return alert("Enter recipient email!");
 
     const emailContent = `Summary:\n${summary}\n\nAction Items:\n${actionItems
