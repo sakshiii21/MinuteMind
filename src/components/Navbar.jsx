@@ -139,7 +139,7 @@ const Button = styled.button`
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
-  const backendURL = "https://minutemind-backend.onrender.com"; // Change to deployed backend URL when live
+ const backendURL = import.meta.env.VITE_BACKEND_URL;// Change to deployed backend URL when live
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -157,17 +157,6 @@ const Navbar = () => {
     }
   }, []);
 
-  const handleLogin = () => {
-    const state = "dashboard";
-    window.location.href = `${backendURL}/auth/google?state=${state}`;
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-    fetch(`${backendURL}/logout`, { method:"POST", credentials:"include" }).catch(()=>{});
-  };
-
   return (
     <NavbarContainer>
       <LogoContainer>
@@ -178,23 +167,7 @@ const Navbar = () => {
         </LogoText>
       </LogoContainer>
 
-      <AuthContainer>
-        {user ? (
-          <UserInfo>
-            {user.picture 
-              ? <Avatar src={user.picture} alt={user.name} />
-              : <AvatarLetter>{user.name?.charAt(0)}</AvatarLetter>
-            }
-            <WelcomeText>
-              <UserName>{user.name}</UserName>
-              <UserRole>{user.email}</UserRole>
-            </WelcomeText>
-            <Button variant="logout" onClick={handleLogout}>Logout</Button>
-          </UserInfo>
-        ) : (
-          <Button variant="login" onClick={handleLogin}>Sign In With Google</Button>
-        )}
-      </AuthContainer>
+      
     </NavbarContainer>
   );
 };

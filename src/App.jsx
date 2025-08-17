@@ -274,8 +274,6 @@ function App() {
   const [summary, setSummary] = useState("");
   const [actionItems, setActionItems] = useState([]);
   const [recipient, setRecipient] = useState("");
-  const [user, setUser] = useState(null);
-  const backendURL = "https://minutemind-backend.onrender.com"; 
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
