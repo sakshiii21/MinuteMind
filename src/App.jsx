@@ -1,5 +1,272 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import styled, { createGlobalStyle } from "styled-components";
 import { jsPDF } from "jspdf";
+
+const GlobalStyle = createGlobalStyle`
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+`;
+
+const AppContainer = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 0;
+`;
+
+const Header = styled.header`
+  text-align: center;
+  margin-bottom: 3rem;
+`;
+
+const Title = styled.h1`
+  color: white;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const Subtitle = styled.p`
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.2rem;
+  font-weight: 300;
+`;
+
+const MainContent = styled.main`
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+`;
+
+const Card = styled.section`
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const CardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+`;
+
+const StepNumber = styled.div`
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-right: 1rem;
+  font-size: 0.9rem;
+`;
+
+const CardTitle = styled.h2`
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2d3748;
+`;
+
+const FileUploadContainer = styled.div`
+  position: relative;
+  margin-bottom: 1rem;
+`;
+
+const FileUploadLabel = styled.label`
+  display: block;
+  padding: 2rem;
+  border: 2px dashed #cbd5e0;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+
+  &:hover {
+    border-color: #667eea;
+    background: #edf2f7;
+  }
+`;
+
+const FileUploadText = styled.div`
+  color: #4a5568;
+  font-weight: 500;
+
+  .highlight {
+    color: #667eea;
+    font-weight: 600;
+  }
+`;
+
+const HiddenFileInput = styled.input`
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+`;
+
+const TextArea = styled.textarea`
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  &::placeholder {
+    color: #a0aec0;
+  }
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  &::placeholder {
+    color: #a0aec0;
+  }
+`;
+
+const Button = styled.button`
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  
+  ${props => {
+    switch (props.variant) {
+      case 'primary':
+        return `
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+          }
+        `;
+      case 'success':
+        return `
+          background: linear-gradient(135deg, #48bb78, #38a169);
+          color: white;
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+          }
+        `;
+      case 'purple':
+        return `
+          background: linear-gradient(135deg, #9f7aea, #805ad5);
+          color: white;
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(159, 122, 234, 0.4);
+          }
+        `;
+      default:
+        return `
+          background: #e2e8f0;
+          color: #4a5568;
+          &:hover {
+            background: #cbd5e0;
+          }
+        `;
+    }
+  }}
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const ActionItemsList = styled.ul`
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const ActionItem = styled.li`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+`;
+
+const Checkbox = styled.input`
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+`;
+
+const ActionText = styled.span`
+  flex: 1;
+  font-size: 0.95rem;
+  color: ${props => props.completed ? '#a0aec0' : '#2d3748'};
+  text-decoration: ${props => props.completed ? 'line-through' : 'none'};
+`;
+
+const ShareContainer = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: end;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+`;
 
 function App() {
   const [transcript, setTranscript] = useState("");
@@ -7,8 +274,9 @@ function App() {
   const [summary, setSummary] = useState("");
   const [actionItems, setActionItems] = useState([]);
   const [recipient, setRecipient] = useState("");
+  const [user, setUser] = useState(null);
+  const backendURL = "https://minutemind-backend.onrender.com"; 
 
-  /** 📂 File Upload (TXT only for now) */
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file && file.type === "text/plain") {
@@ -20,7 +288,6 @@ function App() {
     }
   };
 
-  /** ⚡ Generate Summary + Action Items */
   const handleGenerate = async () => {
     if (!transcript) {
       alert("Please provide a transcript first!");
@@ -54,7 +321,6 @@ function App() {
     }
   };
 
-  /** 📥 Download PDF */
   const handleDownload = () => {
     if (!summary && actionItems.length === 0) {
       alert("No content to download yet!");
@@ -64,13 +330,11 @@ function App() {
     const doc = new jsPDF();
     doc.setFontSize(16).text("MinuteMind - Meeting Notes", 10, 10);
 
-    // Summary Section
     if (summary) {
       doc.setFontSize(12).text("Summary:", 10, 20);
       doc.setFont("times", "normal").text(summary, 10, 30, { maxWidth: 180 });
     }
 
-    // Action Items Section
     if (actionItems.length > 0) {
       let y = 60;
       doc.setFontSize(12).text("Action Items:", 10, y);
@@ -86,7 +350,6 @@ function App() {
     doc.save("MeetingNotes.pdf");
   };
 
-  /** ✅ Toggle Action Item Checkbox */
   const toggleAction = (id) => {
     setActionItems((prev) =>
       prev.map((item) =>
@@ -95,7 +358,6 @@ function App() {
     );
   };
 
-  /** 📧 Send Email */
   const handleSendEmail = async () => {
     if (!recipient) return alert("Enter recipient email!");
 
@@ -124,115 +386,128 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      {/* Header */}
-      <header className="max-w-3xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold">MinuteMind — AI Meeting Notes</h1>
-        <p className="text-sm text-gray-600">
-          Upload your transcript, generate a summary, and share it instantly.
-        </p>
-      </header>
+    <>
+      <GlobalStyle />
+      <AppContainer>
+        <Header>
+          <Title>MinuteMind</Title>
+          <Subtitle>Transform your meeting transcripts into actionable insights</Subtitle>
+        </Header>
 
-      <main className="max-w-3xl mx-auto px-4 pb-16 space-y-6">
-        {/* 1. Transcript Upload */}
-        <section className="bg-white rounded-2xl shadow p-4 space-y-4">
-          <h2 className="font-semibold">1. Transcript Input</h2>
-          <input
-            type="file"
-            accept=".txt"
-            onChange={handleFileUpload}
-            className="block w-full text-sm text-gray-600"
-          />
-          <textarea
-            className="w-full h-40 p-2 border rounded-lg text-sm"
-            placeholder="Or paste transcript here..."
-            value={transcript}
-            onChange={(e) => setTranscript(e.target.value)}
-          />
-        </section>
+        <MainContent>
+          <Card>
+            <CardHeader>
+              <StepNumber>1</StepNumber>
+              <CardTitle>Upload Transcript</CardTitle>
+            </CardHeader>
+            
+            <FileUploadContainer>
+              <FileUploadLabel htmlFor="file-upload">
+                <FileUploadText>
+                  <span className="highlight">Click to upload</span> or drag and drop your .txt file here
+                </FileUploadText>
+              </FileUploadLabel>
+              <HiddenFileInput
+                id="file-upload"
+                type="file"
+                accept=".txt"
+                onChange={handleFileUpload}
+              />
+            </FileUploadContainer>
 
-        {/* 2. Prompt & Generate */}
-        <section className="bg-white rounded-2xl shadow p-4 space-y-4">
-          <h2 className="font-semibold">2. Prompt & Generate</h2>
-          <input
-            type="text"
-            className="w-full p-2 border rounded-lg text-sm"
-            placeholder="e.g. Summarize in bullet points for executives"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-          />
-          <button
-            onClick={handleGenerate}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Generate Summary
-          </button>
-        </section>
-
-        {/* 3. Summary */}
-        {summary && (
-          <section className="bg-white rounded-2xl shadow p-4">
-            <h2 className="font-semibold mb-2">3. Generated Summary</h2>
-            <textarea
-              className="w-full h-60 p-2 border rounded-lg text-sm"
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
+            <TextArea
+              rows={6}
+              placeholder="Or paste your meeting transcript here..."
+              value={transcript}
+              onChange={(e) => setTranscript(e.target.value)}
             />
-          </section>
-        )}
+          </Card>
 
-        {/* 4. Action Items */}
-        {actionItems.length > 0 && (
-          <section className="bg-white rounded-2xl shadow p-4">
-            <h2 className="font-semibold mb-2">4. Action Items</h2>
-            <ul className="space-y-2">
-              {actionItems.map((item) => (
-                <li key={item.id} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={item.done}
-                    onChange={() => toggleAction(item.id)}
-                  />
-                  <span
-                    className={item.done ? "line-through text-gray-500" : ""}
-                  >
-                    {item.text}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+          <Card>
+            <CardHeader>
+              <StepNumber>2</StepNumber>
+              <CardTitle>Customize & Generate</CardTitle>
+            </CardHeader>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <Input
+                type="text"
+                placeholder="e.g., Summarize in bullet points for executives"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+            </div>
+            
+            <Button variant="primary" onClick={handleGenerate}>
+              Generate Summary
+            </Button>
+          </Card>
 
-        {/* 5. Share / Export */}
-        <section className="bg-white rounded-2xl shadow p-4 space-y-3">
-          <h2 className="font-semibold">5. Share & Export</h2>
-          <div className="flex gap-3">
-            <button
-              onClick={handleDownload}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-            >
-              Download PDF
-            </button>
-            <div className="flex-1">
-              <input
+          {summary && (
+            <Card>
+              <CardHeader>
+                <StepNumber>3</StepNumber>
+                <CardTitle>Generated Summary</CardTitle>
+              </CardHeader>
+              
+              <TextArea
+                rows={8}
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+              />
+            </Card>
+          )}
+
+          {actionItems.length > 0 && (
+            <Card>
+              <CardHeader>
+                <StepNumber>4</StepNumber>
+                <CardTitle>Action Items</CardTitle>
+              </CardHeader>
+              
+              <ActionItemsList>
+                {actionItems.map((item) => (
+                  <ActionItem key={item.id}>
+                    <Checkbox
+                      type="checkbox"
+                      checked={item.done}
+                      onChange={() => toggleAction(item.id)}
+                    />
+                    <ActionText completed={item.done}>
+                      {item.text}
+                    </ActionText>
+                  </ActionItem>
+                ))}
+              </ActionItemsList>
+            </Card>
+          )}
+
+          <Card>
+            <CardHeader>
+              <StepNumber>3</StepNumber>
+              <CardTitle>Share & Export</CardTitle>
+            </CardHeader>
+            
+            <ShareContainer>
+              <Button variant="success" onClick={handleDownload}>
+                Download PDF
+              </Button>
+              
+              <Input
                 type="email"
-                className="w-full p-2 border rounded-lg text-sm"
-                placeholder="Recipient email..."
+                placeholder="Enter recipient email..."
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
               />
-            </div>
-            <button
-              onClick={handleSendEmail}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
-            >
-              Send Email
-            </button>
-          </div>
-        </section>
-      </main>
-    </div>
+              
+              <Button variant="purple" onClick={handleSendEmail}>
+                Send Email
+              </Button>
+            </ShareContainer>
+          </Card>
+        </MainContent>
+      </AppContainer>
+    </>
   );
 }
 
