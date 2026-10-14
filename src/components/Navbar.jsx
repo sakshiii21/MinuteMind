@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styled, { keyframes } from "styled-components";
 
 const fadeIn = keyframes`
@@ -138,25 +138,6 @@ const Button = styled.button`
 `;
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
- const backendURL = import.meta.env.VITE_BACKEND_URL;// Change to deployed backend URL when live
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if(storedUser) setUser(JSON.parse(storedUser));
-    else {
-      fetch(`${backendURL}/api/me`, { credentials: "include" })
-        .then(res => res.json())
-        .then(data => { 
-          if(data?.email){ 
-            setUser(data); 
-            localStorage.setItem("user", JSON.stringify(data)); 
-          }
-        })
-        .catch(()=>{});
-    }
-  }, []);
-
   return (
     <NavbarContainer>
       <LogoContainer>

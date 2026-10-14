@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { jsPDF } from "jspdf";
+import { backendURL } from "./config";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -293,7 +294,7 @@ function App() {
     }
 
     try {
-      const res = await fetch("https://minutemind-backend.onrender.com/api/summarize", {
+      const res = await fetch(`${backendURL}/api/summarize`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcript, prompt }),
@@ -364,7 +365,7 @@ const handleSendEmail = async () => {
       .join("\n")}`;
 
     try {
-      const res = await fetch("https://minutemind-backend.onrender.com/api/send-email", {
+      const res = await fetch(`${backendURL}/api/send-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
